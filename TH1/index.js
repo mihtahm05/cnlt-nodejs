@@ -14,4 +14,5 @@ const server = http.createServer((req, res) => { //(tạo web sever gồm req v�
     res.end('Không tìm thấy trang')
    }
 })
+
 server.listen(3000)
