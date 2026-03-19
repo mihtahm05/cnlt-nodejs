@@ -1,0 +1,40 @@
+<%- include('layouts/header') %>
+<%- include('layouts/navbar') %>
+
+<section class="page-section" style="padding-top: 150px; padding-bottom: 50px;">
+    <div class="container">
+        <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">
+            <%= club.name %>
+        </h2>
+        
+        <div class="divider-custom">
+            <div class="divider-custom-line"></div>
+            <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+            <div class="divider-custom-line"></div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm p-4">
+                    <p class="lead"><strong>Mô tả:</strong> <%= club.desc %></p>
+                    <p><strong>Số lượng thành viên:</strong> <%= club.members %> người</p>
+                    
+                    <p>Trạng thái: 
+                        <% if (club.hot) { %>
+                            <span class="badge bg-danger">🔥 Câu lạc bộ nổi bật</span>
+                        <% } else { %>
+                            <span class="badge bg-secondary">Bình thường</span>
+                        <% } %>
+                    </p>
+                    
+                    <hr>
+                    <a href="/list" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('layouts/footer') %>

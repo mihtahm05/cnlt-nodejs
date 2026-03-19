@@ -1,0 +1,43 @@
+<%- include('layouts/header') %>
+<%- include('layouts/navbar') %>
+
+<section class="page-section" id="contact" style="padding-top: calc(6rem + 72px);">
+    <div class="container">
+        <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">
+            <%= title %>
+        </h2>
+        
+        <div class="divider-custom">
+            <div class="divider-custom-line"></div>
+            <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+            <div class="divider-custom-line"></div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <form id="contactForm">
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="name" type="text" placeholder="Nhập tên..." required />
+                        <label for="name">Họ và tên</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="email" type="email" placeholder="name@example.com" required />
+                        <label for="email">Địa chỉ Email</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="phone" type="tel" placeholder="0123..." required />
+                        <label for="phone">Số điện thoại</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="message" placeholder="Lời nhắn..." style="height: 10rem" required></textarea>
+                        <label for="message">Lời nhắn</label>
+                    </div>
+
+                    <button class="btn btn-primary btn-xl" id="submitButton" type="submit">Gửi thông tin</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('layouts/footer') %>
