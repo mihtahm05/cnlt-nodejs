@@ -1,0 +1,159 @@
+/* Tổng thể trang */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Tiêu đề chính */
+h1 {
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+/* Nút tạo bài viết mới */
+a[href="/blogposts/new"] {
+    display: inline-block;
+    background-color: #3498db;
+    color: #ffffff !important;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    margin-bottom: 20px;
+}
+
+a[href="/blogposts/new"]:hover {
+    background-color: #2980b9;
+}
+
+/* Danh sách bài viết */
+ul {
+    list-style: none; /* Sửa từ list-content */
+    padding: 0;
+    width: 100%;
+    max-width: 600px;
+}
+
+li {
+    background: white;
+    margin-bottom: 15px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Tên tác giả trong danh sách */
+li strong {
+    display: block;
+    font-size: 1.2em;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+/* Nội dung ngắn trong danh sách */
+li span {
+    color: #7f8c8d;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Nút xem chi tiết */
+a[href*="/blogposts/"] {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+/* Loại bỏ đường kẻ ngang */
+hr {
+    display: none;
+}
+
+/* Container cho Form */
+form {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+    margin-top: 20px;
+}
+
+/* Bố cục nhãn trên, ô nhập dưới */
+form p {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Input và Textarea */
+input[type="text"], 
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dcdde1;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus, 
+textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+textarea {
+    height: 150px;
+    resize: vertical;
+}
+
+/* Nút Cập nhật màu xanh lá */
+button[type="submit"] {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    transition: background 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #27ae60;
+}
+
+/* Quay về trang chủ */
+a[href="/"] {
+    display: inline-block;
+    margin-top: 20px;
+    color: #7f8c8d;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+a[href="/"]:hover {
+    color: #34495e;
+    text-decoration: underline;
+}
