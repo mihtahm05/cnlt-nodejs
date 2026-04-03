@@ -67,6 +67,44 @@ li span {
     margin-bottom: 10px;
 }
 
+/* Container chính */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+/* Định dạng chung cho tất cả thẻ <a> bên trong .action-buttons */
+.action-buttons a {
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: white;
+    transition: 0.2s;
+}
+
+/* Nút đầu tiên (Xem chi tiết) */
+.action-buttons a:nth-child(1) {
+    background-color: #3498db; /* Xanh dương */
+}
+
+/* Nút thứ hai (Chỉnh sửa) */
+.action-buttons a:nth-child(2) {
+    background-color: #f39c12; /* Cam */
+}
+
+/* Nút thứ ba (Xóa) */
+.action-buttons a:nth-child(3) {
+    background-color: #e74c3c; /* Đỏ */
+}
+
+/* Hiệu ứng hover chung */
+.action-buttons a:hover {
+    opacity: 0.8;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
 /* Nút xem chi tiết */
 a[href*="/blogposts/"] {
     color: #3498db;

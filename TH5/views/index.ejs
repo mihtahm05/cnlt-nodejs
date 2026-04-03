@@ -14,11 +14,11 @@
             <li>
                 <strong><%= post.title %></strong><br>
                 <span><%= post.body %></span><br>
-                
-                <a href="/<%= post._id %>">Xem chi tiết</a>
-                <a href="/<%= post._id %>/edit">Chỉnh sửa</a>
-                <a href="/<%= post._id %>/delete" onclick="return confirm('Chắc chắn xóa không?')">Xóa bài</a>
-                <hr>
+                <div class="action-buttons">
+                    <a href="/<%= post._id %>">Xem chi tiết</a>
+                    <a href="/<%= post._id %>/edit">Chỉnh sửa</a>
+                    <a href="/<%= post._id %>/delete" onclick="return confirm('Chắc chắn xóa không?')">Xóa bài</a>
+                </div>
             </li>
         <% }) %>
     </ul>
