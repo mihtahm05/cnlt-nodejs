@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chủ</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>Danh sách bài viết</h1>
+    <a href="/new">Tạo bài viết mới</a>
+    
+    <ul>
+        <% posts.forEach(post => { %>
+            <li>
+                <strong><%= post.title %></strong><br>
+                <span><%= post.body %></span><br>
+                
+                <a href="/<%= post._id %>">Xem chi tiết</a>
+                <a href="/<%= post._id %>/edit">Chỉnh sửa</a>
+                <a href="/<%= post._id %>/delete" onclick="return confirm('Chắc chắn xóa không?')">Xóa bài</a>
+                <hr>
+            </li>
+        <% }) %>
+    </ul>
+</body>
+</html>

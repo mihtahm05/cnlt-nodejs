@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh sửa bài viết</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>Cập nhật bài viết</h1>
+
+    <form action="/<%= post._id %>/update" method="POST">
+        <div>
+            <label>Tiêu đề:</label><br>
+            <input type="text" name="title" value="<%= post.title %>" required>
+        </div>
+        
+        <br>
+        
+        <div>
+            <label>Nội dung:</label><br>
+            <textarea name="body" rows="5" cols="30" required><%= post.body %></textarea>
+        </div>
+
+        <br>
+        
+        <button type="submit">Lưu thay đổi</button>
+        <a href="/">Hủy bỏ</a>
+    </form>
+</body>
+</html>
