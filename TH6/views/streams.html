@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Streams - NodeJS Hub</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <nav>
+        <a href="/">Trang chủ</a>
+        <a href="/events">Sự kiện (Events)</a>
+        <a href="/request">Request & Headers</a>
+        <a href="/streams">Dòng dữ liệu (Streams)</a>
+    </nav>
+    <header>
+        <h1>Làm việc với Streams</h1>
+    </header>
+    <div class="container">
+        <div class="card">
+            <h3>4.1 Readable Stream (Đọc file story.txt)</h3>
+            <iframe src="/api/read-stream" style="width: 100%; height: 60px; border: 1px solid #ccc;"></iframe>
+        </div>
+
+        <div class="card">
+            <h3>4.2 Writable Stream (Ghi vào output.txt)</h3>
+            <form method="POST" action="/api/write-stream" target="resultFrame">
+                <input type="text" name="data" placeholder="Nhập văn bản để ghi vào file..." required>
+                <button type="submit">Ghi File</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>4.3 Transform Stream (Chữ IN HOA)</h3>
+            <form method="POST" action="/api/transform-stream" target="resultFrame">
+                <input type="text" name="data" placeholder="Nhập chữ thường..." required>
+                <button type="submit">Transform</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>4.4 Duplex Stream (Echo server)</h3>
+            <form method="POST" action="/api/duplex-stream" target="resultFrame">
+                <input type="text" name="data" placeholder="Gửi tin nhắn..." required>
+                <button type="submit">Gửi Duplex</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Khung Hiển Thị Kết Quả Tương Tác</h3>
+            <iframe name="resultFrame" style="width: 100%; height: 60px; border: 1px dashed #0056b3;"></iframe>
+        </div>
+    </div>
+</body>
+
+</html>

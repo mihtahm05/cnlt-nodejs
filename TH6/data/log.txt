@@ -1,0 +1,7 @@
+ [2026-04-09T13:54:59.963Z] Event: {"page":"events","action":"visit","time":"2026-04-09T13:54:59.959Z"}
+[2026-04-09T13:55:01.103Z] Event: {"action":"manual_trigger","from":"/event"}
+[2026-04-09T14:00:17.414Z] Event: {"page":"events","action":"visit","time":"2026-04-09T14:00:17.414Z"}
+[2026-04-09T17:26:03.450Z] Sự kiện: userAction | Dữ liệu: {"user":"Client","action":"Click trigger","counter":1}
+[2026-04-09T17:26:07.008Z] Sự kiện: userAction | Dữ liệu: {"user":"Client","action":"Click trigger","counter":2}
+[2026-04-09T17:26:07.523Z] Sự kiện: userAction | Dữ liệu: {"user":"Client","action":"Click trigger","counter":3}
+[2026-04-09T17:26:07.884Z] Sự kiện: userAction | Dữ liệu: {"user":"Client","action":"Click trigger","counter":4}

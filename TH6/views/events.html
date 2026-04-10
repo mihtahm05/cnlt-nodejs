@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Events - NodeJS Hub</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <nav>
+        <a href="/">Trang chủ</a>
+        <a href="/events">Sự kiện (Events)</a>
+        <a href="/request">Request & Headers</a>
+        <a href="/streams">Dòng dữ liệu (Streams)</a>
+    </nav>
+    <header>
+        <h1>Xử lý Sự kiện (EventEmitter)</h1>
+    </header>
+    <div class="container">
+        <div class="card">
+            <h3>Kích hoạt sự kiện</h3>
+            <p>Nhấn nút bên dưới để trigger event "userAction". Server sẽ ghi log vào file log.txt.</p>
+            <button onclick="triggerEvent()">Trigger Event</button>
+            <p id="event-result" style="color: green; margin-top: 10px;"></p>
+        </div>
+        <div class="card">
+            <h3>Xem Log</h3>
+            <a href="/download-log" target="_blank"><button style="background: #17a2b8;">Đọc/Tải file Log</button></a>
+        </div>
+    </div>
+
+    <script>
+        function triggerEvent() {
+            fetch('/event', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('event-result').innerText = data.message + " (Counter: " + data.counter + ")";
+                });
+        }
+    </script>
+</body>
+
+</html>

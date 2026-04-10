@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Request & Headers - NodeJS Hub</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow: auto;
+            max-height: 450px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="/">Trang chủ</a>
+        <a href="/events">Sự kiện (Events)</a>
+        <a href="/request">Request & Headers</a>
+        <a href="/streams">Dòng dữ liệu (Streams)</a>
+    </nav>
+
+    <header>
+        <h1>🔍 Thông tin Request</h1>
+        <p>Dữ liệu được lấy từ <code>req.method</code>, <code>req.url</code>, <code>url.parse()</code> và
+            <code>req.headers</code></p>
+    </header>
+
+    <div class="container">
+        <div style="text-align: left; margin-top: 20px;">
+            <p><strong>Method:</strong> <span id="method">Loading...</span></p>
+            <p><strong>URL:</strong> <span id="url">Loading...</span></p>
+            <p><strong>Query:</strong> <span id="query">Loading...</span></p>
+            <hr>
+            <p><strong>Request Headers:</strong></p>
+            <pre id="headers"></pre>
+        </div>
+
+        <button onclick="location.reload()"
+            style="margin-top: 20px; background:#28a745; color:white; padding:12px 24px; border:none; border-radius:4px; cursor:pointer;">
+            Làm mới dữ liệu
+        </button>
+    </div>
+
+    <script>
+        async function loadRequestInfo() {
+            try {
+                const res = await fetch('/api/request-info');
+                const data = await res.json();
+
+                document.getElementById('method').textContent = data.method;
+                document.getElementById('url').textContent = data.url;
+
+                const queryStr = data.query && Object.keys(data.query).length
+                    ? JSON.stringify(data.query, null, 2)
+                    : '{} (không có query string)';
+                document.getElementById('query').textContent = queryStr;
+
+                document.getElementById('headers').textContent = JSON.stringify(data.headers, null, 2);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('headers').innerHTML = '<span style="color:red">Lỗi: Không kết nối được với /api/request-info</span>';
+            }
+        }
+
+        window.onload = loadRequestInfo;
+    </script>
+</body>
+
+</html>

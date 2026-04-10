@@ -1,0 +1,6 @@
+1. Mục tiêu
+Xây dựng một ứng dụng NodeJS hoàn chỉnh tích hợp:
+- Event-driven, EventEmitter
+- HTTP Server
+- Request và Header
+- Stream (Readable, Writable, Transform, Duplex)
