@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const url = require('url');
+const url = require('url'); // Khai báo 1 lần duy nhất ở đây
 
 // Import Custom Classes
 const AppEmitter = require('./events/AppEmitter');
@@ -12,7 +12,7 @@ const EchoDuplex = require('./streams/EchoDuplex');
 const appEmitter = new AppEmitter();
 let eventCounter = 0;
 
-// Đăng ký listener (sử dụng on và once)
+// Đăng ký listener
 appEmitter.once('firstRun', () => console.log('Server NodeJS đã khởi động!'));
 appEmitter.on('userAction', (data) => {
     eventCounter++;
@@ -22,7 +22,7 @@ appEmitter.on('userAction', (data) => {
 
 appEmitter.emit('firstRun');
 
-// Helper function để đọc và trả về file tĩnh (HTML, CSS, JPG)
+// Helper function để đọc và trả về file tĩnh
 function serveStaticFile(res, filePath, contentType) {
     const fullPath = path.join(__dirname, filePath);
     fs.readFile(fullPath, (err, data) => {
@@ -38,6 +38,7 @@ function serveStaticFile(res, filePath, contentType) {
 
 // Khởi tạo HTTP Server
 const server = http.createServer((req, res) => {
+    // 1. Phân tích URL ngay từ đầu để dùng chung cho mọi route
     const parsedUrl = url.parse(req.url, true);
     const pathname = parsedUrl.pathname;
     const method = req.method;
@@ -48,85 +49,90 @@ const server = http.createServer((req, res) => {
         if (pathname === '/events') return serveStaticFile(res, 'views/events.html', 'text/html; charset=utf-8');
         if (pathname === '/request') return serveStaticFile(res, 'views/request.html', 'text/html; charset=utf-8');
         if (pathname === '/streams') return serveStaticFile(res, 'views/streams.html', 'text/html; charset=utf-8');
-
         if (pathname === '/css/style.css') return serveStaticFile(res, 'public/css/style.css', 'text/css');
     }
 
     // ----- ROUTING API & ENDPOINTS -----
 
-    // 1. Trả dữ liệu JSON (/json)
+    // 1. Trả dữ liệu JSON
     if (pathname === '/json' && method === 'GET') {
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ status: 'success', message: 'Đây là dữ liệu JSON trả về từ Server' }));
-        return;
+        return res.end(JSON.stringify({ status: 'success', message: 'Đây là dữ liệu JSON trả về từ Server' }));
     }
 
-    // 2. Streaming hình ảnh (/image)
+    // 2. Streaming hình ảnh
     if (pathname === '/image' && method === 'GET') {
         const imgPath = path.join(__dirname, 'public/images/logo.jpg');
-        res.setHeader('Content-Type', 'image/jpeg');
         const imgStream = fs.createReadStream(imgPath);
+        
+        imgStream.on('open', () => {
+            res.setHeader('Content-Type', 'image/jpeg');
+            imgStream.pipe(res);
+        });
+
         imgStream.on('error', () => {
-            res.writeHead(404);
+            res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
             res.end('Image not found. Vui lòng copy 1 file logo.jpg vào thư mục public/images/');
         });
-        imgStream.pipe(res); // Streaming hình ảnh
         return;
     }
 
-    // 3. Trigger Event (/event)
+    // 3. Trigger Event
     if (pathname === '/event' && method === 'POST') {
         appEmitter.emit('userAction', { user: 'Client', action: 'Click trigger' });
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ message: 'Sự kiện đã được kích hoạt và ghi log!', counter: eventCounter }));
-        return;
+        return res.end(JSON.stringify({ message: 'Sự kiện đã được kích hoạt và ghi log!', counter: eventCounter }));
     }
 
-    // 4. Download/Đọc file log (/download-log)
+    // 4. Download/Đọc file log
     if (pathname === '/download-log' && method === 'GET') {
         const logPath = path.join(__dirname, 'data/log.txt');
         res.writeHead(200, {
             'Content-Type': 'text/plain; charset=utf-8',
-            'Content-Disposition': 'inline; filename="log.txt"' // Sửa 'inline' thành 'attachment' nếu muốn ép tải xuống
+            'Content-Disposition': 'inline; filename="log.txt"'
         });
         const readStream = fs.createReadStream(logPath);
-        readStream.pipe(res);
-        return;
+        readStream.on('error', () => res.end('Chưa có file log.'));
+        return readStream.pipe(res);
     }
 
-    // 5. Hiển thị thông tin Request & Header (/api/request-info)
-    const url = require('url');
+    // 5. Hiển thị thông tin Request & Header (ĐÃ SỬA LỖI KHAI BÁO LẠI URL)
+    // 5. Hiển thị thông tin Request & Header - Theo đúng yêu cầu bài thực hành
+    if (pathname === '/api/request-info' && method === 'GET') {
 
-    if (req.url === '/api/request-info') {
-        const parsed = url.parse(req.url, true);
-
+        // Thiết lập Response Headers (bắt buộc phải có res.writeHead)
         res.writeHead(200, {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
             'X-Custom-Header': 'NodeJS-Practice-Request-Demo',
-            'X-Powered-By': 'HTTP Module'
+            'X-Powered-By': 'HTTP Module - url.parse()',
+            'Cache-Control': 'no-cache, no-store'
         });
 
-        const data = {
-            method: req.method,
-            url: req.url,
-            query: parsed.query,
+        // Chuẩn bị dữ liệu theo đúng yêu cầu
+        const responseData = {
+            method: method,
+            url: req.url,                    // URL gốc (req.url)
+            pathname: parsedUrl.pathname || 'N/A',   // Pathname sau khi parse
+            search: parsedUrl.search || '(không có)', // Query String
+            query: parsedUrl.query || {},            // Parsed Query (object)
             headers: req.headers
         };
 
-        res.end(JSON.stringify(data));
-        return;
+        return res.end(JSON.stringify(responseData, null, 2));
     }
  
-    // ----- CÁC ENDPOINT DEMO STREAMS (Từ form gửi lên) -----
+    // ----- CÁC ENDPOINT DEMO STREAMS -----
 
-    // 4.1 Readable Stream (Giữ nguyên - chạy tốt)
+    // 4.1 Readable Stream
     if (pathname === '/api/read-stream' && method === 'GET') {
         res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-        fs.createReadStream(path.join(__dirname, 'data/story.txt')).pipe(res);
-        return;
+        const storyPath = path.join(__dirname, 'data/story.txt');
+        const storyStream = fs.createReadStream(storyPath);
+        storyStream.on('error', () => res.end('Không tìm thấy file data/story.txt'));
+        return storyStream.pipe(res);
     }
 
-    // 4.2 Writable Stream (Đã sửa chữ 'if' và giải mã tiếng Việt)
+    // 4.2 Writable Stream
     if (pathname === '/api/write-stream' && method === 'POST') {
         let body = '';
         req.on('data', chunk => { body += chunk; });
@@ -145,18 +151,15 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // 4.3 Transform Stream (Sửa lại để không bị dính data=)
+    // 4.3 Transform Stream
     if (pathname === '/api/transform-stream' && method === 'POST') {
         let body = '';
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
             const params = new URLSearchParams(body);
             const content = params.get('data') || '';
-
             res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
             const transformer = new TextTransform();
-
-            // Đẩy dữ liệu sạch vào transformer
             transformer.write(content);
             transformer.end();
             transformer.pipe(res);
@@ -164,25 +167,31 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // 4.4 Duplex Stream (Sửa tương tự 4.3)
+    // 4.4 Duplex Stream
     if (pathname === '/api/duplex-stream' && method === 'POST') {
         let body = '';
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
             const params = new URLSearchParams(body);
             const content = params.get('data') || '';
-
             res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
             const duplexer = new EchoDuplex();
-
             duplexer.write(content);
             duplexer.end();
             duplexer.pipe(res);
         });
         return;
     }
-})
+
+    // 404 cho các route không tồn tại
+    if (!res.writableEnded) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('404 - Trang web không tồn tại');
+    }
+});
+
 // Chạy server tại port 3000
 server.listen(3000, () => {
+    console.log('Server NodeJS đã khởi động!');
     console.log('Server đang chạy tại: http://localhost:3000');
 });

@@ -17,18 +17,26 @@
     <header>
         <h1>Xử lý Sự kiện (EventEmitter)</h1>
     </header>
-    <div class="container">
-        <div class="card">
-            <h3>Kích hoạt sự kiện</h3>
-            <p>Nhấn nút bên dưới để trigger event "userAction". Server sẽ ghi log vào file log.txt.</p>
-            <button onclick="triggerEvent()">Trigger Event</button>
-            <p id="event-result" style="color: green; margin-top: 10px;"></p>
+        <div class="container">
+            <div class="card">
+                <h3>Kích hoạt sự kiện</h3>
+                <p>Nhấn nút bên dưới để trigger event "userAction". Server sẽ ghi log vào file log.txt.</p>
+                <button onclick="triggerEvent()">Trigger Event</button>
+                <p id="event-result"></p>
+            </div>
+            <div class="card">
+                <h3>Quản lý Log</h3>
+                <p>Xem hoặc tải file log.txt</p>
+        
+                <a href="/download-log" target="_blank">
+                    <button style="background: #17a2b8; width: 100%;"> Xem Log ở tab mới</button>
+                </a>
+        
+                <button onclick="downloadLog()" style="background: #28a745; width: 100%; margin-top: 10px;">
+                    Tải Log.txt về máy
+                </button>
+            </div>
         </div>
-        <div class="card">
-            <h3>Xem Log</h3>
-            <a href="/download-log" target="_blank"><button style="background: #17a2b8;">Đọc/Tải file Log</button></a>
-        </div>
-    </div>
 
     <script>
         function triggerEvent() {
@@ -38,6 +46,27 @@
                     document.getElementById('event-result').innerText = data.message + " (Counter: " + data.counter + ")";
                 });
         }
+        function downloadLog() {
+                fetch('/download-log')
+                    .then(res => {
+                        if (!res.ok) throw new Error('File không tồn tại hoặc lỗi server');
+                        return res.blob();
+                    })
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'log.txt';        // Tên file khi tải về
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('❌ Không thể tải file log. Kiểm tra server hoặc đường dẫn /download-log');
+                    });
+            }
     </script>
 </body>
 
