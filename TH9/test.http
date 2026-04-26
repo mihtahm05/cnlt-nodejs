@@ -1,0 +1,59 @@
+### 1.1 Lấy toàn bộ danh sách
+GET http://localhost:3000/students
+
+### 1.2 Lấy chi tiết (Báo 404 nếu không thấy)
+GET http://localhost:3000/students/1
+
+### 1.3 Thêm mới (Báo 400 nếu thiếu trường name hoặc age)
+
+POST http://localhost:3000/students 
+Content-Type: application/json
+
+{
+  "name": "A",
+  "email": "minhtam@gmail.com", 
+  "age": 20
+}
+
+### 1.5 Cập nhật
+PUT http://localhost:3000/students/1
+Content-Type: application/json
+
+{ "age": 99 }
+
+### 1.6 Xóa sinh viên
+DELETE http://localhost:3000/students/1
+
+### 1.7 Tìm kiếm (Mở rộng)
+GET http://localhost:3000/students?name=Tran
+
+### 1.8 Phân trang (Bài 5)
+GET http://localhost:3000/students?page=1&limit=2
+
+### BÀI 2: BLOCKING VS NON-BLOCKING ========================
+
+### 2.1 Đọc file đồng bộ
+GET http://localhost:3000/sync
+
+### 2.2 Đọc file bất đồng bộ (Chụp thêm màn hình Terminal console.log)
+GET http://localhost:3000/async
+
+### BÀI 3: SESSION =========================================
+
+### 3.1 Kiểm tra profile khi chưa đăng nhập (Sẽ báo lỗi 401)
+GET http://localhost:3000/profile
+
+### 3.2 Đăng nhập (Lưu session)
+POST http://localhost:3000/login    
+Content-Type: application/json
+
+{
+  "username": "admin",  
+  "password": "123456"
+}   
+
+### 3.3 Xem profile sau khi đăng nhập thành công
+GET http://localhost:3000/profile
+
+### 3.4 Đăng xuất
+GET http://localhost:3000/logout

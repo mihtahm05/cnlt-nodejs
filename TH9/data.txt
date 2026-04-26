@@ -1,0 +1,4 @@
+Đây là file dữ liệu mẫu dùng để minh họa Blocking vs Non-blocking trong Node.js.
+Nội dung file này sẽ được đọc bằng readFileSync (blocking) và readFile (non-blocking).
+Bạn có thể copy thêm nhiều dòng lorem ipsum để file dài hơn nếu muốn thấy rõ thời gian.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
