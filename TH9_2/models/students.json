@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "Nguyễn Văn A",
+    "email": "nva@example.com",
+    "age": 20,
+    "class": "CNTT1",
+    "isDeleted": false
+  },
+  {
+    "id": 2,
+    "name": "Trần Thị B",
+    "email": "ttb@example.com",
+    "age": 19,
+    "class": "CNTT1",
+    "isDeleted": false
+  },
+  {
+    "id": 3,
+    "name": "Lê Văn C",
+    "email": "lvc@example.com",
+    "age": 21,
+    "class": "CNTT2",
+    "isDeleted": true
+  },
+  {
+    "id": 4,
+    "name": "Phạm Thị D",
+    "email": "ptd@example.com",
+    "age": 22,
+    "class": "CNTT2",
+    "isDeleted": false
+  },
+  {
+    "id": 5,
+    "name": "Hoàng Văn E",
+    "email": "hve@example.com",
+    "age": 20,
+    "class": "CNTT1",
+    "isDeleted": false
+  }
+]

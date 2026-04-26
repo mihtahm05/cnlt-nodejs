@@ -1,0 +1,91 @@
+###1. Lấy danh sách (Sẽ bị chặn nếu chưa đăng nhập)
+GET http://localhost:3000/students
+
+###Đăng nhập để lấy quyền (Session)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "123456"
+}
+#### Test đăng xuất
+POST http://localhost:3000/logout
+
+### 3. Lấy lại danh sách sau khi đăng nhập
+GET http://localhost:3000/students
+
+### 4. Lấy chi tiết sinh viên id = 1
+GET http://localhost:3000/students/2
+
+
+
+
+
+### 4. Thêm mới, sinh viên tuổi < 16 - Bị chặn
+POST http://localhost:3000/students
+Content-Type: application/json
+
+{
+    "name": "Le Van D",
+    "email": "d@gmail.com",
+    "age": 15,
+    "className": "CNTT2"
+}
+
+### 5. Thêm mới, sinh viên tuổi >= 16 - Thành công
+POST http://localhost:3000/students
+Content-Type: application/json
+
+{
+    "name": "Le Van D",
+    "email": "d@gmail.com",
+    "age": 20,
+    "className": "CNTT2"
+}
+### 6. Cập nhật, sinh viên id = 1
+PUT http://localhost:3000/students/1
+Content-Type: application/json
+
+{
+    "age": 99
+}
+### 7. Xóa, sinh viên id = 1
+DELETE http://localhost:3000/students/1
+
+### Check lại danh sách sau khi xóa
+GET http://localhost:3000/students
+
+### Test thống kê
+GET http://localhost:3000/students/stats
+
+
+
+### Bước 2.7: Tìm kiếm, lọc, sắp xếp
+# Lấy sinh viên có tên chứa chữ "A", học lớp "CNTT1", và sắp xếp tuổi giảm dần (từ lớn đến bé)
+GET http://localhost:3000/students?name=A&class=CNTT1&sort=age_desc
+
+### Phân trang: Lấy trang 1, mỗi trang 2 sinh viên
+
+GET http://localhost:3000/students?page=1&limit=2
+
+### PHẦN 4: SO SÁNH ĐỒNG BỘ VÀ BẤT ĐỒNG BỘ ====================
+
+### Bước 4.1: Test xử lý Đồng bộ (Blocking)
+# Lưu ý: Bấm chạy cái này xong, server sẽ phải tính toán rất nặng và bị "treo" tạm thời.
+GET http://localhost:3000/heavy-sync
+
+### Bước 4.2: Test xử lý Bất đồng bộ (Non-blocking)
+# Lưu ý: Bấm chạy cái này, tác vụ nặng sẽ được đẩy ra chờ (setTimeout), server rảnh tay ngay để làm việc khác.
+GET http://localhost:3000/heavy-async
+
+
+### PHẦN 5: THỐNG KÊ DỮ LIỆU SINH VIÊN =========================
+
+### Bước 5.1: Thống kê tổng quan
+# Yêu cầu trả về: total, active, deleted, averageAge
+GET http://localhost:3000/students/stats
+
+### Bước 5.2: Thống kê theo lớp
+# Yêu cầu trả về mảng danh sách số lượng sinh viên gộp theo từng lớp
+GET http://localhost:3000/students/stats/class
