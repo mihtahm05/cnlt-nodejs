@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Realtime</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Login Modal -->
+        <div id="loginModal" class="modal active">
+            <div class="modal-content">
+                <h2>Đăng nhập Chat</h2>
+                <input type="text" id="usernameInput" placeholder="Nhập tên của bạn..." maxlength="20">
+                <button id="loginBtn">Tham gia</button>
+            </div>
+        </div>
+
+        <!-- Main Chat App -->
+        <div id="chatApp" class="chat-app hidden">
+            <header>
+                <h1>💬 Chat Realtime</h1>
+                <div class="user-info">
+                    <span id="currentUser"></span>
+                    <span id="onlineCount" class="online-badge">0 online</span>
+                </div>
+            </header>
+
+            <div class="chat-container">
+                <!-- Danh sách users online -->
+                <div class="users-panel">
+                    <h3>👥 Online (<span id="onlineCount2">0</span>)</h3>
+                    <div id="onlineUsersList"></div>
+                </div>
+
+                <!-- Chat area -->
+                <div class="chat-panel">
+                    <div id="chatMessages" class="messages"></div>
+                    <div class="message-input">
+                        <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." maxlength="500">
+                        <button id="sendBtn">Gửi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
