@@ -184,7 +184,7 @@ socket.on('newMessage', (message) => {
 function updateOnlineUsers(users) {
     // Lọc ra các user khác với currentUser
     const otherUsers = users.filter(user => user.username !== currentUser);
-    onlineCount.textContent = (otherUsers.length) + ' online';
+    
     onlineCount2.textContent = otherUsers.length;
 
     onlineUsersList.innerHTML = otherUsers.map(user => {

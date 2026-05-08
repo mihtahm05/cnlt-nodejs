@@ -6,14 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Realtime</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
     <div class="container">
+        <!-- Login Modal -->
         <div id="loginModal" class="modal active">
             <div class="login-card">
+                <!-- Logo & App Name -->
                 <div class="login-header">
                     <div class="logo">
                         <i class="fas fa-comments"></i>
@@ -23,6 +26,8 @@
                         <p class="slogan">Hãy cùng trò chuyện và kết nối mọi khoảnh khắc</p>
                     </div>
                 </div>
+
+                <!-- Login Form -->
                 <div class="login-form">
                     <div class="input-group">
                         <div class="input-icon">
@@ -35,6 +40,8 @@
                         <span>Tham gia Chat</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
+
+                    <!-- Features highlight -->
                     <div class="features">
                         <div class="feature">
                             <i class="fas fa-users"></i>
@@ -45,20 +52,18 @@
                             <span>Tin nhắn tức thì</span>
                         </div>
                         <div class="feature">
-                            <i class="fas fa-images"></i>
-                            <span>Images &<br>Stickers</span>
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Tương thích mobile</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Main Chat App -->
         <div id="chatApp" class="chat-app hidden">
             <header>
-                <div class="header-left">
-                    <button id="backBtn" class="mobile-only icon-btn"><i class="fas fa-arrow-left"></i></button>
-                    <h1>💬 Chat Realtime</h1>
-                </div>
+                <h1>💬 Chat Realtime</h1>
                 <div class="user-info">
                     <span id="currentUser"></span>
                     <span id="onlineCount" class="online-badge">0 online</span>
@@ -66,32 +71,29 @@
             </header>
 
             <div class="chat-container">
+                <!-- Danh sách users online -->
                 <div class="users-panel">
                     <h3>👥 Online (<span id="onlineCount2">0</span>)</h3>
                     <div id="onlineUsersList"></div>
                 </div>
 
+                <!-- Chat area -->
                 <div class="chat-panel">
-                    <div id="chatMessages" class="messages">
-                        <div class="empty-state">👆 Chọn một người bạn để bắt đầu trò chuyện...</div>
+                    <div id="chatMessages" class="messages"></div>
+                    <div class="message-input">
+                        <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." maxlength="500">
+                        <button id="emojiBtn" class="icon-btn" title="Emoji">😀</button>
+                        <button id="stickerBtn" class="icon-btn" title="Sticker">🎀</button>
+                        <label class="icon-btn file-input-label" title="Gửi ảnh">
+                            <i class="fas fa-image"></i>
+                            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                        </label>
+                        <button id="sendBtn">Gửi</button>
                     </div>
-                    <div class="message-input-container">
-                        <div id="emojiPicker" class="picker-container hidden"></div>
-                        <div id="stickerPicker" class="picker-container hidden"></div>
-
-                        <div class="message-input">
-                            <button id="stickerBtn" class="icon-btn" title="Stickers">🎀</button>
-                            <button id="emojiBtn" class="icon-btn" title="Emoji">😀</button>
-                            <label class="icon-btn file-input-label" title="Gửi ảnh">
-                                <i class="fas fa-image"></i>
-                                <input type="file" id="imageInput" accept="image/*,video/*" style="display: none;">
-                            </label>
-                            <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." maxlength="500">
-                            <button id="sendBtn">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <!-- Emoji picker -->
+                    <div id="emojiPicker" class="emoji-picker hidden"></div>
+                    <!-- Sticker picker -->
+                    <div id="stickerPicker" class="sticker-picker hidden"></div>
                 </div>
             </div>
         </div>

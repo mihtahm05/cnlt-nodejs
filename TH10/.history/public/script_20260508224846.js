@@ -1,6 +1,7 @@
 const socket = io();
 let currentUser = '';
-let selectedUsername = null; // Chuyển sang dùng Username làm gốc thay vì ID
+let selectedUserId = null;
+let selectedUsername = null;
 let chatHistories = {};
 
 const loginModal = document.getElementById('loginModal');
@@ -19,12 +20,12 @@ const stickerBtn = document.getElementById('stickerBtn');
 const imageInput = document.getElementById('imageInput');
 const emojiPicker = document.getElementById('emojiPicker');
 const stickerPicker = document.getElementById('stickerPicker');
-const backBtn = document.getElementById('backBtn');
-const chatContainer = document.querySelector('.chat-container');
 
-const emojis = ['😀', '😂', '😍', '😘', '😢', '😡', '👍', '👎', '❤️', '💔', '💯', '🔥', '✨', '🎉', '🎊', '😎', '🤔', '😴', '🤓', '🦁', '🐯', '🐻'];
-const stickers = ['🍕', '🍔', '🍟', '🌮', '🎂', '🍰', '🎁', '🎀', '🎈', '⭐', '🌟', '💫', '🌈', '☀️', '🌙', '🦄', '🚀', '⚡'];
+// Emoji & Sticker lists
+const emojis = ['😀','😂','😍','😘','😢','😡','👍','👎','❤️','💔','💯','🔥','✨','🎉','🎊','😎','🤔','😴','🤓','🦁','🐯','🐻','🐼'];
+const stickers = ['🍕','🍔','🍟','🌮','🎂','🍰','🎁','🎀','🎈','⭐','🌟','💫','🌈','☀️','🌙','🦄','🚀','⚡'];
 
+// Initialize emoji picker
 function initEmojiPicker() {
     emojiPicker.innerHTML = '';
     emojis.forEach(emoji => {
@@ -40,6 +41,7 @@ function initEmojiPicker() {
     });
 }
 
+// Initialize sticker picker
 function initStickerPicker() {
     stickerPicker.innerHTML = '';
     stickers.forEach(sticker => {
@@ -51,6 +53,7 @@ function initStickerPicker() {
     });
 }
 
+// Login
 function login() {
     const username = usernameInput.value.trim();
     if (username && username.length >= 2 && username.length <= 20) {
@@ -60,6 +63,7 @@ function login() {
         chatApp.classList.remove('hidden');
         currentUserSpan.textContent = username;
         usernameInput.value = '';
+        messageInput.focus();
     } else {
         alert('⚠️ Tên phải từ 2-20 ký tự!');
     }
@@ -70,61 +74,70 @@ usernameInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') login();
 });
 
-emojiBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+// Emoji & Sticker buttons
+emojiBtn.addEventListener('click', () => {
     emojiPicker.classList.toggle('hidden');
     stickerPicker.classList.add('hidden');
     if (!emojiPicker.classList.contains('hidden')) initEmojiPicker();
 });
 
-stickerBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+stickerBtn.addEventListener('click', () => {
     stickerPicker.classList.toggle('hidden');
     emojiPicker.classList.add('hidden');
     if (!stickerPicker.classList.contains('hidden')) initStickerPicker();
 });
 
+// Send sticker
 function sendSticker(sticker) {
-    if (selectedUsername) {
+    if (selectedUserId) {
         socket.emit('sendMessage', {
-            receiver: selectedUsername,
+            receiver: selectedUserId,
             message: sticker,
             type: 'sticker'
         });
         stickerPicker.classList.add('hidden');
+    } else {
+        alert('⚠️ Chọn bạn chat trước!');
     }
 }
 
+// Image upload - ✅ HOẠT ĐỘNG HOÀN CHỈNH
 imageInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
-    if (file && selectedUsername) {
-        if (file.size > 5 * 1024 * 1024) {
+    if (file && selectedUserId) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
             alert('⚠️ Ảnh tối đa 5MB!');
             return;
         }
+        
         const reader = new FileReader();
         reader.onload = (event) => {
             socket.emit('sendMessage', {
-                receiver: selectedUsername,
+                receiver: selectedUserId,
                 message: event.target.result,
                 type: 'image'
             });
             imageInput.value = '';
         };
         reader.readAsDataURL(file);
+    } else if (!selectedUserId) {
+        alert('⚠️ Chọn bạn chat trước!');
     }
 });
 
+// Send message
 function sendMessage() {
     const message = messageInput.value.trim();
-    if (message && selectedUsername) {
+    if (message && selectedUserId) {
         socket.emit('sendMessage', {
-            receiver: selectedUsername,
+            receiver: selectedUserId,
             message: message,
             type: 'text'
         });
         messageInput.value = '';
         emojiPicker.classList.add('hidden');
+    } else if (!selectedUserId) {
+        alert('⚠️ Chọn bạn chat trước!');
     }
 }
 
@@ -136,25 +149,17 @@ messageInput.addEventListener('keypress', (e) => {
     }
 });
 
+// Close pickers when clicking outside
 document.addEventListener('click', (e) => {
-    if (!e.target.closest('.picker-container') && !e.target.closest('.icon-btn')) {
+    if (!e.target.closest('.icon-btn') && !e.target.closest('.emoji-picker') && !e.target.closest('.sticker-picker')) {
         emojiPicker.classList.add('hidden');
         stickerPicker.classList.add('hidden');
     }
 });
 
-if (backBtn) {
-    backBtn.addEventListener('click', () => {
-        chatContainer.classList.remove('chat-active');
-        selectedUsername = null;
-        document.querySelectorAll('.user-item').forEach(item => item.classList.remove('selected'));
-    });
-}
-
+// Socket events
 socket.on('onlineUsers', (users) => {
-    // Lọc bỏ các user trùng lặp tên do mở nhiều tab
-    const uniqueUsers = Array.from(new Map(users.map(u => [u.username, u])).values());
-    updateOnlineUsers(uniqueUsers);
+    updateOnlineUsers(users);
 });
 
 socket.on('chatHistory', (history) => {
@@ -164,8 +169,8 @@ socket.on('chatHistory', (history) => {
         if (!chatHistories[chatKey]) chatHistories[chatKey] = [];
         chatHistories[chatKey].push(msg);
     });
-    if (selectedUsername) {
-        displayChatForUser(selectedUsername);
+    if (selectedUserId) {
+        displayChatForUser(selectedUserId, selectedUsername);
     }
 });
 
@@ -174,70 +179,61 @@ socket.on('newMessage', (message) => {
     if (!chatHistories[chatKey]) chatHistories[chatKey] = [];
     chatHistories[chatKey].push(message);
 
-    // Nếu tin nhắn thuộc về cuộc hội thoại đang mở -> Hiện ngay lập tức
+    // Hiển thị nếu đang chat với người này
     if (selectedUsername === message.sender || selectedUsername === message.receiver) {
         displayMessage(message);
     }
+
     updateUnreadCount();
 });
 
+// Update online users
 function updateOnlineUsers(users) {
-    // Lọc ra các user khác với currentUser
-    const otherUsers = users.filter(user => user.username !== currentUser);
-    onlineCount.textContent = (otherUsers.length) + ' online';
-    onlineCount2.textContent = otherUsers.length;
+    onlineCount.textContent = users.length + ' online';
+    onlineCount2.textContent = users.length;
 
-    onlineUsersList.innerHTML = otherUsers.map(user => {
-        const unreadCount = getUnreadCount(user.username);
-        // Kiểm tra selected dựa trên Username (KHÔNG dùng ID) để đảm bảo không mất active khi f5
-        const isSelected = selectedUsername === user.username ? 'selected' : '';
-
-        return `
-            <div class="user-item ${isSelected}" data-username="${user.username}"
-                 onclick="selectUser('${user.username}')">
-                <div class="status"></div>
-                <span>${user.username}</span>
-                ${unreadCount > 0 ? `<span class="unread-count">${unreadCount}</span>` : ''}
-            </div>
-        `;
-    }).join('');
+    onlineUsersList.innerHTML = users
+        .filter(user => user.username !== currentUser)
+        .map(user => {
+            const unreadCount = getUnreadCount(user.username);
+            return `
+                <div class="user-item ${selectedUserId === user.id ? 'selected' : ''}" 
+                     data-user-id="${user.id}" data-username="${user.username}"
+                     onclick="selectUser('${user.id}', '${user.username}')">
+                    <div class="status"></div>
+                    <span>${user.username}</span>
+                    ${unreadCount > 0 ? `<span class="unread-count">${unreadCount}</span>` : ''}
+                </div>
+            `;
+        }).join('');
 }
 
-function selectUser(username) {
+// Select user
+function selectUser(userId, username) {
+    selectedUserId = userId;
     selectedUsername = username;
-
-    if (chatContainer) chatContainer.classList.add('chat-active');
 
     document.querySelectorAll('.user-item').forEach(item => {
         item.classList.remove('selected');
     });
+    event.currentTarget.classList.add('selected');
 
-    const selectedNode = document.querySelector(`.user-item[data-username="${username}"]`);
-    if (selectedNode) selectedNode.classList.add('selected');
-
-    displayChatForUser(username);
-    updateUnreadCount();
+    displayChatForUser(userId, username);
+    updateUnreadCount(); // Reset unread for this user
     messageInput.focus();
     emojiPicker.classList.add('hidden');
     stickerPicker.classList.add('hidden');
 }
 
-function displayChatForUser(username) {
+function displayChatForUser(userId, username) {
     const chatKey = [currentUser, username].sort().join('_');
     const messages = chatHistories[chatKey] || [];
 
-    if (messages.length === 0) {
-        chatMessages.innerHTML = `<div class="empty-state">Bắt đầu trò chuyện với ${username}...</div>`;
-    } else {
-        chatMessages.innerHTML = messages.map(createMessageElement).join('');
-    }
+    chatMessages.innerHTML = messages.map(createMessageElement).join('');
     scrollToBottom();
 }
 
 function displayMessage(message) {
-    const emptyState = document.querySelector('.empty-state');
-    if (emptyState) emptyState.remove();
-
     const messageElement = createMessageElement(message);
     chatMessages.insertAdjacentHTML('beforeend', messageElement);
     scrollToBottom();
@@ -248,7 +244,7 @@ function createMessageElement(message) {
     const senderDisplay = isSent ? 'Bạn' : message.sender;
     let content = '';
 
-    switch (message.type) {
+    switch(message.type) {
         case 'image':
             content = `<img src="${message.message}" alt="Ảnh" class="message-image" onerror="this.style.display='none'">`;
             break;
@@ -256,15 +252,12 @@ function createMessageElement(message) {
             content = `<div class="message-sticker">${message.message}</div>`;
             break;
         default:
-            content = `${message.message}`;
+            content = `<strong>${senderDisplay}:</strong> ${message.message}`;
     }
 
     return `
         <div class="message ${isSent ? 'sent' : 'received'}">
-            <div class="message-bubble">
-                ${!isSent ? `<strong>${senderDisplay}</strong><br>` : ''}
-                ${content}
-            </div>
+            <div class="message-bubble">${content}</div>
             <div class="message-meta">${message.time}</div>
         </div>
     `;
@@ -273,25 +266,21 @@ function createMessageElement(message) {
 function getUnreadCount(username) {
     const chatKey = [currentUser, username].sort().join('_');
     const messages = chatHistories[chatKey] || [];
-    // Tính tin nhắn đến chưa đọc
-    return messages.filter(msg => msg.sender === username && msg.receiver === currentUser).length;
+    return messages.filter(msg => msg.sender !== currentUser && msg.receiver === currentUser).length;
 }
 
 function updateUnreadCount() {
     document.querySelectorAll('.user-item').forEach(item => {
-        if (item.dataset.username !== selectedUsername) {
+        if (item.dataset.userId !== selectedUserId) {
             const username = item.dataset.username;
             const count = getUnreadCount(username);
-            let countEl = item.querySelector('.unread-count');
-
+            const countEl = item.querySelector('.unread-count');
             if (count > 0) {
                 if (!countEl) {
                     item.insertAdjacentHTML('beforeend', `<span class="unread-count">${count}</span>`);
                 } else {
                     countEl.textContent = count;
                 }
-            } else if (countEl) {
-                countEl.remove();
             }
         }
     });
@@ -300,3 +289,14 @@ function updateUnreadCount() {
 function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
+// ESC to close chat
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && selectedUserId) {
+        selectedUserId = null;
+        selectedUsername = null;
+        chatMessages.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 2rem; font-style: italic;">👆 Chọn bạn chat để bắt đầu...</div>';
+        document.querySelectorAll('.user-item').forEach(item => item.classList.remove('selected'));
+        messageInput.value = '';
+    }
+});

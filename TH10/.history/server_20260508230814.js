@@ -7,52 +7,65 @@ const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
-    cors: { origin: "*", methods: ["GET", "POST"] }
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
 });
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+// Storage
 const onlineUsers = new Map();
 const chatHistories = new Map();
 
 io.on('connection', (socket) => {
-    console.log('✅ Kết nối mới:', socket.id);
+    console.log('✅ User connected:', socket.id);
 
     socket.on('login', (username) => {
+        // Validate username
         if (!username || username.length < 2 || username.length > 20) {
             socket.emit('error', 'Tên người dùng không hợp lệ!');
             return;
         }
 
-        const cleanUsername = username.trim();
-
-        // CỐT LÕI: Tham gia vào "Room" mang tên chính user đó để đảm bảo gửi là nhận ngay
-        socket.join(cleanUsername);
-
-        onlineUsers.set(socket.id, {
-            id: socket.id,
-            username: cleanUsername,
+        const userId = socket.id;
+        onlineUsers.set(userId, {
+            id: userId,
+            username: username.trim(),
             socketId: socket.id
         });
 
-        console.log(`👤 ${cleanUsername} đã đăng nhập`);
+        console.log(`👤 ${username} logged in`);
 
-        // Cập nhật danh sách online cho TOÀN BỘ user
-        io.emit('onlineUsers', Array.from(onlineUsers.values()));
+        // Send online users to this socket
+        socket.emit('onlineUsers', Array.from(onlineUsers.values()));
 
-        // Gửi lịch sử chat cho người vừa đăng nhập
+        // Send chat history to this socket
         const history = [];
         for (let [key, messages] of chatHistories.entries()) {
             history.push(...messages);
         }
         socket.emit('chatHistory', history);
+
+        // Broadcast updated online users to all others
+        socket.broadcast.emit('onlineUsers', Array.from(onlineUsers.values()));
     });
 
     socket.on('sendMessage', (data) => {
         const sender = onlineUsers.get(socket.id);
-        if (!sender || !data.receiver || !data.message) return;
+        if (!sender) {
+            socket.emit('error', 'Không tìm thấy người gửi!');
+            return;
+        }
+
+        if (!data.receiver || !data.message) {
+            socket.emit('error', 'Dữ liệu tin nhắn không hợp lệ!');
+            return;
+        }
 
         const message = {
             sender: sender.username,
@@ -62,30 +75,30 @@ io.on('connection', (socket) => {
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
 
-        // Lưu lịch sử
+        // Store message
         const chatKey = [sender.username, data.receiver].sort().join('_');
         if (!chatHistories.has(chatKey)) {
             chatHistories.set(chatKey, []);
         }
         chatHistories.get(chatKey).push(message);
 
-        console.log(`💬 ${sender.username} -> ${data.receiver}: ${data.type}`);
+        console.log(`💬 ${sender.username} -> ${data.receiver}: ${data.message.substring(0, 30)}...`);
 
-        // Bắn tin nhắn trực tiếp vào Room của người nhận (Realtime 100%)
-        io.to(data.receiver).emit('newMessage', message);
-
-        // Bắn ngược lại hiển thị cho người gửi (Nếu họ không đang tự chat với chính mình)
-        if (sender.username !== data.receiver) {
-            socket.emit('newMessage', message);
+        // Send to receiver if online
+        const receiver = Array.from(onlineUsers.values()).find(u => u.username === data.receiver);
+        if (receiver && receiver.socketId !== socket.id) {
+            io.to(receiver.socketId).emit('newMessage', message);
         }
+
+        // Send back to sender
+        socket.emit('newMessage', message);
     });
 
     socket.on('disconnect', () => {
         const user = onlineUsers.get(socket.id);
         if (user) {
-            console.log(`👋 ${user.username} đã thoát`);
+            console.log(`👋 ${user.username} disconnected`);
             onlineUsers.delete(socket.id);
-            // Cập nhật lại danh sách ngay lập tức khi có người out
             io.emit('onlineUsers', Array.from(onlineUsers.values()));
         }
     });
@@ -93,5 +106,6 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`🚀 Server chạy tại http://localhost:${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📱 Open http://localhost:${PORT} in multiple tabs to test!`);
 });

@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
         }
 
         const cleanUsername = username.trim();
-
+        
         // CỐT LÕI: Tham gia vào "Room" mang tên chính user đó để đảm bảo gửi là nhận ngay
         socket.join(cleanUsername);
 
@@ -73,7 +73,7 @@ io.on('connection', (socket) => {
 
         // Bắn tin nhắn trực tiếp vào Room của người nhận (Realtime 100%)
         io.to(data.receiver).emit('newMessage', message);
-
+        
         // Bắn ngược lại hiển thị cho người gửi (Nếu họ không đang tự chat với chính mình)
         if (sender.username !== data.receiver) {
             socket.emit('newMessage', message);

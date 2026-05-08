@@ -1,6 +1,7 @@
 const socket = io();
 let currentUser = '';
-let selectedUsername = null; // Chuyển sang dùng Username làm gốc thay vì ID
+let selectedUserId = null;
+let selectedUsername = null;
 let chatHistories = {};
 
 const loginModal = document.getElementById('loginModal');
@@ -87,7 +88,7 @@ stickerBtn.addEventListener('click', (e) => {
 function sendSticker(sticker) {
     if (selectedUsername) {
         socket.emit('sendMessage', {
-            receiver: selectedUsername,
+            receiver: selectedUsername, // FIX: Gửi Username thay vì ID
             message: sticker,
             type: 'sticker'
         });
@@ -105,7 +106,7 @@ imageInput.addEventListener('change', (e) => {
         const reader = new FileReader();
         reader.onload = (event) => {
             socket.emit('sendMessage', {
-                receiver: selectedUsername,
+                receiver: selectedUsername, // FIX: Gửi Username thay vì ID
                 message: event.target.result,
                 type: 'image'
             });
@@ -119,7 +120,7 @@ function sendMessage() {
     const message = messageInput.value.trim();
     if (message && selectedUsername) {
         socket.emit('sendMessage', {
-            receiver: selectedUsername,
+            receiver: selectedUsername, // FIX: Gửi Username thay vì ID
             message: message,
             type: 'text'
         });
@@ -143,18 +144,16 @@ document.addEventListener('click', (e) => {
     }
 });
 
-if (backBtn) {
-    backBtn.addEventListener('click', () => {
-        chatContainer.classList.remove('chat-active');
-        selectedUsername = null;
-        document.querySelectorAll('.user-item').forEach(item => item.classList.remove('selected'));
-    });
-}
+// Logic cho Mobile (Nút Back)
+backBtn.addEventListener('click', () => {
+    chatContainer.classList.remove('chat-active');
+    selectedUserId = null;
+    selectedUsername = null;
+    document.querySelectorAll('.user-item').forEach(item => item.classList.remove('selected'));
+});
 
 socket.on('onlineUsers', (users) => {
-    // Lọc bỏ các user trùng lặp tên do mở nhiều tab
-    const uniqueUsers = Array.from(new Map(users.map(u => [u.username, u])).values());
-    updateOnlineUsers(uniqueUsers);
+    updateOnlineUsers(users);
 });
 
 socket.on('chatHistory', (history) => {
@@ -174,7 +173,6 @@ socket.on('newMessage', (message) => {
     if (!chatHistories[chatKey]) chatHistories[chatKey] = [];
     chatHistories[chatKey].push(message);
 
-    // Nếu tin nhắn thuộc về cuộc hội thoại đang mở -> Hiện ngay lập tức
     if (selectedUsername === message.sender || selectedUsername === message.receiver) {
         displayMessage(message);
     }
@@ -182,37 +180,38 @@ socket.on('newMessage', (message) => {
 });
 
 function updateOnlineUsers(users) {
-    // Lọc ra các user khác với currentUser
-    const otherUsers = users.filter(user => user.username !== currentUser);
-    onlineCount.textContent = (otherUsers.length) + ' online';
-    onlineCount2.textContent = otherUsers.length;
+    onlineCount.textContent = users.length + ' online';
+    onlineCount2.textContent = users.length;
 
-    onlineUsersList.innerHTML = otherUsers.map(user => {
-        const unreadCount = getUnreadCount(user.username);
-        // Kiểm tra selected dựa trên Username (KHÔNG dùng ID) để đảm bảo không mất active khi f5
-        const isSelected = selectedUsername === user.username ? 'selected' : '';
-
-        return `
-            <div class="user-item ${isSelected}" data-username="${user.username}"
-                 onclick="selectUser('${user.username}')">
-                <div class="status"></div>
-                <span>${user.username}</span>
-                ${unreadCount > 0 ? `<span class="unread-count">${unreadCount}</span>` : ''}
-            </div>
-        `;
-    }).join('');
+    onlineUsersList.innerHTML = users
+        .filter(user => user.username !== currentUser)
+        .map(user => {
+            const unreadCount = getUnreadCount(user.username);
+            return `
+                <div class="user-item ${selectedUserId === user.id ? 'selected' : ''}" 
+                     data-user-id="${user.id}" data-username="${user.username}"
+                     onclick="selectUser('${user.id}', '${user.username}')">
+                    <div class="status"></div>
+                    <span>${user.username}</span>
+                    ${unreadCount > 0 ? `<span class="unread-count">${unreadCount}</span>` : ''}
+                </div>
+            `;
+        }).join('');
 }
 
-function selectUser(username) {
+function selectUser(userId, username) {
+    selectedUserId = userId;
     selectedUsername = username;
 
-    if (chatContainer) chatContainer.classList.add('chat-active');
+    // Kích hoạt giao diện chat trên điện thoại
+    chatContainer.classList.add('chat-active');
 
     document.querySelectorAll('.user-item').forEach(item => {
         item.classList.remove('selected');
     });
 
-    const selectedNode = document.querySelector(`.user-item[data-username="${username}"]`);
+    // Đảm bảo highlight đúng người dùng vừa chọn
+    const selectedNode = document.querySelector(`.user-item[data-user-id="${userId}"]`);
     if (selectedNode) selectedNode.classList.add('selected');
 
     displayChatForUser(username);
@@ -273,8 +272,7 @@ function createMessageElement(message) {
 function getUnreadCount(username) {
     const chatKey = [currentUser, username].sort().join('_');
     const messages = chatHistories[chatKey] || [];
-    // Tính tin nhắn đến chưa đọc
-    return messages.filter(msg => msg.sender === username && msg.receiver === currentUser).length;
+    return messages.filter(msg => msg.sender !== currentUser && msg.receiver === currentUser).length;
 }
 
 function updateUnreadCount() {

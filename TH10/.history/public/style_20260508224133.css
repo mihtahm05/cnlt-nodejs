@@ -1,0 +1,42 @@
+/* ==================== FEATURES SECTION - ĐÃ FIX ICON ==================== */
+.features {
+    margin-top: 2.8rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+    padding: 0 10px;
+}
+
+.feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    color: #6b7280;
+    font-size: 0.93rem;
+    padding: 1.2rem 10px;
+    border-radius: 20px;
+    transition: all 0.4s ease;
+    line-height: 1.4;
+}
+
+.feature:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.08);
+    transform: translateY(-6px);
+}
+
+.feature i {
+    font-size: 2.25rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ==================== Phần còn lại giữ nguyên ==================== */
